@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weather App</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #83a4d4, #b6fbff);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: start;
+      min-height: 100vh;
+      padding: 30px;
+      color: #333;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    #weatherForm {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      width: 250px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      background-color: #0066cc;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #004999;
+    }
+
+    #weatherResult {
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 20px 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      text-align: center;
+      min-width: 300px;
+    }
+
+    .temp {
+      font-size: 48px;
+      font-weight: bold;
+    }
+
+    .condition {
+      margin-top: 10px;
+      font-size: 20px;
+    }
+
+    .icon {
+      width: 64px;
+      height: 64px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🌦️ Live Weather Checker</h1>
+  <form id="weatherForm">
+    <input type="text" id="locationInput" placeholder="Enter location (e.g., London)" required />
+    <button type="submit">Check Weather</button>
+  </form>
+
+  <div id="weatherResult"></div>
+
+  <script>
+    const form = document.getElementById('weatherForm');
+    const result = document.getElementById('weatherResult');
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const location = document.getElementById('locationInput').value.trim();
+      const apiKey = '1657e54821974586960153717252606';
+      const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${location}&aqi=yes`;
+
+      result.innerHTML = 'Loading...';
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Location not found');
+
+        const data = await response.json();
+        const weatherHtml = `
+          <h2>${data.location.name}, ${data.location.country}</h2>
+          <img class="icon" src="${data.current.condition.icon}" alt="${data.current.condition.text}" />
+          <div class="temp">${data.current.temp_c}°C</div>
+          <div class="condition">${data.current.condition.text}</div>
+          <div>Humidity: ${data.current.humidity}%</div>
+          <div>Wind: ${data.current.wind_kph} kph</div>
+        `;
+        result.innerHTML = weatherHtml;
+      } catch (error) {
+        result.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+      }
+    });
+  </script>
+
+</body>
+</html>
